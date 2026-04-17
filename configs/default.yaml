@@ -1,0 +1,66 @@
+defaults:
+  - override hydra/job_logging: disabled
+
+project:
+  root_dir: ${oc.env:PROJECT_ROOT, .}
+  artifacts_dir: ${project.root_dir}/artifacts
+  cache_dir: ${project.root_dir}/artifacts/cache
+  embedding_dir: ${project.artifacts_dir}/embeddings
+  index_dir: ${project.artifacts_dir}/index
+  hyde_dir: ${project.artifacts_dir}/hyde
+  results_dir: ${project.root_dir}/outputs
+  router_dir: ${project.artifacts_dir}/router
+
+API_BASE:
+  # This is for vLLM (OpenAI compatible service)
+  base_url: "http://127.0.0.1:8000/v1"
+  timeout: 120
+  max_retries: 5
+  backoff_factor: 2.0
+  concurrency: 6
+
+  models:
+    # ===== LLM (vLLM) =====
+    # Note: The following model paths are examples, please configure according to your environment
+    llm_default: "Qwen2.5-7B-Instruct"  # Local model name or path
+    llm_cot: "Qwen2.5-7B-Instruct"      # Local model name or path
+    hyde: "Qwen2.5-7B-Instruct"         # Local model name or path
+
+    # ===== Embedding (LOCAL) =====
+    embedding_local: "BAAI/bge-m3"      # Local embedding model name or path
+
+    # ===== Rerank (LOCAL) =====
+    reranker_local: "BAAI/bge-reranker-v2-m3"  # Local rerank model name or path
+
+
+retrieval:
+  chunk_size: 128
+  chunk_overlap: 100
+  max_context_tokens: 1800
+  dense_top_k: 20
+  sparse_top_k: 40
+  final_top_k: 5
+  mmr_lambda: 0.5
+  embedding_batch_size: 16
+  use_gpu: true
+  bm25_k1: 1.5
+  bm25_b: 0.75
+  max_new_tokens: 1024
+  ccp_max_tokens: 256
+
+metrics:
+  semantic_entropy_samples: 5
+  semantic_entropy_temperature: 0.6
+  ccp_top_logprobs: 10
+  nqc_top_k: 10
+
+router:
+  lambda_token: 0.01
+  lambda_time: 0.01
+  improvement_threshold: 0.1
+  test_size: 0.2
+  random_state: 42
+
+logging:
+  level: INFO
+  fmt: "%(asctime)s %(levelname)s [%(name)s] %(message)s"
